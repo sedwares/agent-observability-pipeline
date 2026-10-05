@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: agent_events
+        description: >
+          Raw landing of agent/LLM call events, loaded from agentobs JSONL
+          logs (real usage) and/or the synthetic demo generator. One row
+          per tracked call.
+        loaded_at_field: loaded_at
+        columns:
+          - name: event_id
+            tests:
+              - unique
+              - not_null

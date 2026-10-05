@@ -1,0 +1,14 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentobs"
+version = "0.1.0"
+description = "Lightweight, dependency-free instrumentation for LLM/agent calls — latency, tokens, cost, success/failure as JSON Lines."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
+
+[tool.setuptools]
+packages = ["agentobs"]

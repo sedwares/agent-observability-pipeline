@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: agent_obs_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: agentobs_admin
+      POSTGRES_PASSWORD: agentobs_pass
+      POSTGRES_DB: agent_obs_dw
+    ports:
+      - "5434:5432"   # offset from projects 1 (5432) and 2 (5433)
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentobs_admin -d agent_obs_dw"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  airflow:
+    image: apache/airflow:2.9.3
+    container_name: agent_obs_airflow
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+      _PIP_ADDITIONAL_REQUIREMENTS: "dbt-postgres==1.8.2 psycopg2-binary pandas"
+      AGENTOBS_DB_HOST: postgres
+      AGENTOBS_DB_PORT: 5432
+      AGENTOBS_DB_NAME: agent_obs_dw
+      AGENTOBS_DB_USER: agentobs_admin
+      AGENTOBS_DB_PASSWORD: agentobs_pass
+      ALERT_WEBHOOK_URL: ""   # set to a Slack incoming-webhook URL to enable real alerts
+      ALERT_DAILY_COST_THRESHOLD_USD: "1.00"   # calibrated to demo-scale data - reset to your own clients' actual spend, see scripts/check_alerts.py
+      ALERT_ERROR_RATE_THRESHOLD: "0.15"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./dbt:/opt/airflow/dbt
+      - ./scripts:/opt/airflow/scripts
+      - ./agentobs:/opt/airflow/agentobs
+      - ./data:/opt/airflow/data
+      - airflow_home:/opt/airflow
+    ports:
+      - "8082:8080"   # offset from projects 1 (8080) and 2 (8081)
+    command: standalone
+
+volumes:
+  pgdata:
+  airflow_home:

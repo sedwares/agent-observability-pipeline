@@ -1,0 +1,22 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+build/
+
+# dbt
+dbt/agent_observability/target/
+dbt/agent_observability/dbt_packages/
+dbt/agent_observability/logs/
+
+# airflow
+airflow/dags/__pycache__/
+*.log
+
+# real event logs from your own agents - don't accidentally commit client data
+data/events/*.jsonl
+!data/events/synthetic_events.jsonl
+
+pgdata/

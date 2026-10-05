@@ -1,0 +1,61 @@
+version: 2
+
+models:
+  - name: dim_client
+    description: One row per distinct client_id seen in the event stream.
+    columns:
+      - name: client_id
+        tests: [unique, not_null]
+
+  - name: dim_model
+    description: Model pricing reference, loaded from the model_pricing seed. Update the seed CSV to change rates.
+    columns:
+      - name: model
+        tests: [unique, not_null]
+
+  - name: fact_agent_runs
+    description: >
+      One row per tracked call, with cost computed from the pricing seed.
+      is_pricing_known is false for any model seen in events but missing
+      from the seed - those rows cost $0 in every downstream mart, so this
+      flag exists to make that gap visible rather than silent.
+    columns:
+      - name: event_id
+        tests: [unique, not_null]
+      - name: cost_usd
+        tests: [not_null]
+      - name: is_pricing_known
+        tests:
+          - accepted_values:
+              arguments:
+                values: [true]
+              config:
+                severity: warn   # warn, don't fail the DAG - a new model showing up shouldn't block the pipeline, just prompt a pricing-seed update
+
+  - name: mart_daily_cost
+    description: Calls, cost, error rate, and latency by day, client, and task type. Primary table the dashboard's trend charts read from.
+    columns:
+      - name: error_rate
+        tests:
+          - accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+  - name: mart_client_cost_summary
+    description: One row per client - total spend, call volume, error rate, avg latency. The table you'd hand a client directly.
+    columns:
+      - name: client_id
+        tests: [unique, not_null]
+
+  - name: mart_model_performance
+    description: Cost, latency (avg and p95), and error rate by model and task type.
+    columns:
+      - name: model
+        tests: [not_null]
+
+  - name: mart_error_analysis
+    description: Failure counts by day, client, and error type - feeds the alerting check.
+    columns:
+      - name: client_id
+        tests: [not_null]

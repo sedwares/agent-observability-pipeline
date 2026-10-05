@@ -1,0 +1,42 @@
+name: 'agent_observability'
+version: '1.0.0'
+config-version: 2
+
+profile: 'agent_observability'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+seeds:
+  agent_observability:
+    +column_types:
+      # dbt seed infers CSV decimals as double precision by default, which
+      # Postgres' round(x, n) then rejects downstream - declare these as
+      # numeric at load time instead of casting everywhere they're used.
+      input_cost_per_1k_tokens: numeric(10,6)
+      output_cost_per_1k_tokens: numeric(10,6)
+
+models:
+  agent_observability:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table
+
+# NOTE ON SCHEMA NAMING: no +schema overrides above, on purpose. dbt's
+# default generate_schema_name macro CONCATENATES the profile's target
+# schema with any custom +schema config - "analytics" + "marts" lands
+# tables in "analytics_marts", not "analytics" (confirmed by actually
+# running this against Postgres while building it - see README). Every
+# script and the dashboard query "analytics.<table>" directly, so
+# everything here materializes straight into the profile's target schema
+# instead. If you want staging/marts split into their own schemas, add a
+# macros/generate_schema_name.sql override (the standard dbt pattern) and
+# update the downstream queries to match - don't just add +schema back.

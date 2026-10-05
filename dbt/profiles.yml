@@ -1,0 +1,12 @@
+agent_observability:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('AGENTOBS_DB_HOST', 'localhost') }}"
+      port: "{{ env_var('AGENTOBS_DB_PORT', '5434') | as_number }}"
+      user: "{{ env_var('AGENTOBS_DB_USER', 'agentobs_admin') }}"
+      password: "{{ env_var('AGENTOBS_DB_PASSWORD', 'agentobs_pass') }}"
+      dbname: "{{ env_var('AGENTOBS_DB_NAME', 'agent_obs_dw') }}"
+      schema: analytics
+      threads: 4

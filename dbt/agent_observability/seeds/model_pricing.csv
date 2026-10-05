@@ -1,0 +1,7 @@
+model,input_cost_per_1k_tokens,output_cost_per_1k_tokens,provider,notes
+claude-opus-5-5,0.0150,0.0750,anthropic,EXAMPLE RATE - verify at anthropic.com/pricing before relying on this for real client billing
+claude-sonnet-5-5,0.0030,0.0150,anthropic,EXAMPLE RATE - verify at anthropic.com/pricing before relying on this for real client billing
+claude-sonnet-5,0.0030,0.0150,anthropic,EXAMPLE RATE - verify at anthropic.com/pricing before relying on this for real client billing
+claude-haiku-4-5,0.0008,0.0040,anthropic,EXAMPLE RATE - verify at anthropic.com/pricing before relying on this for real client billing
+gpt-4o,0.0025,0.0100,openai,EXAMPLE RATE - verify at openai.com/api/pricing before relying on this for real client billing
+gpt-4o-mini,0.0002,0.0008,openai,EXAMPLE RATE - verify at openai.com/api/pricing before relying on this for real client billing

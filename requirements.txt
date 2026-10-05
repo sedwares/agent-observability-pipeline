@@ -1,0 +1,15 @@
+# dbt-core<2.0 is pinned deliberately: dbt Labs' new "Fusion" engine
+# (dbt-core 2.x) only supports Postgres as an experimental adapter as of
+# this writing, and installing dbt-postgres==1.8.2 without this pin can
+# still resolve a 2.x dbt-core depending on your pip/index state - if
+# `dbt --version` ever reports something calling itself "dbt-oss" or
+# flags postgres as experimental, this is why. See README troubleshooting.
+dbt-core<2.0
+dbt-postgres==1.8.2
+
+pandas==2.2.2
+SQLAlchemy==2.0.31
+psycopg2-binary==2.9.9
+streamlit==1.37.0
+plotly==5.22.0
+python-dotenv==1.0.1
